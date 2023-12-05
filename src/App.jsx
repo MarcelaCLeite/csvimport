@@ -1,17 +1,46 @@
 import { useState } from 'react'
 import '../src/styles.css'
+import Papa from 'papaparse';
 
 
 function App() {
-  const [file, setFile] = useState('');
+  const [data, setData] = useState([]);
+  const [header, setHeader] = useState([]);
+
 
   const uploadFile = async (e) => {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append('file', e.target.files[0]);
     console.log("Upload");
   }
 
-  const formData = new FormData();
-  formData.append('file', file);
+  const handleChangeHeader = (headers) => {
+    const formattedHeader = headers.map(currentHeader => ({
+      title: currentHeader,
+      dataIndex: currentHeader,
+      key: currentHeader
+    }));
+
+    setHeader(formattedHeader);
+  }
+
+  const handleChange = (e) => {
+    const csv = e.target.files[0];
+    if (csv) {
+      Papa.parse(csv, {
+        header: true,
+        dynamicTyping: true,
+        complete: (result) => {
+          setData(result.data);
+          handleChangeHeader(Object.keys(result.data[0]));
+        },
+        error: (error) => 
+        alert('Error', error.message)
+        },
+      );
+    };
+  };
 
   return (
     <div>
@@ -21,11 +50,16 @@ function App() {
         <label>Selecionar arquivo:</label> 
         <br />
         <input type='file' name='file' 
-        onChange={(e) => setFile(e.target.files[0])}/> 
+        onChange={handleChange}/>
         <br />
         <button type='submit'>Enviar</button>
       </form>
+
+      <Table dataSource={data} columns={header} />
+    
     </div>
+
+    
     
   )
 }
