@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import '../src/styles.css'
 import Papa from 'papaparse';
+import {Table} from 'antd';
 
 
 function App() {
@@ -55,12 +56,11 @@ function App() {
         <button type='submit'>Enviar</button>
       </form>
 
-      <Table dataSource={data} columns={header} />
+      {data?.length > 0 ? 
+        <Table dataSource={data} columns={header} pagination={false} />
+      : null }
     
     </div>
-
-    
-    
   )
 }
 
